@@ -1,37 +1,26 @@
-'use client';
+/**
+ * Sidebar Component
+ * 
+ * This file re-exports the modular sidebar implementation.
+ * The sidebar has been refactored into a modular structure for better maintainability.
+ * 
+ * Structure:
+ * - sidebar/types.ts - Type definitions
+ * - sidebar/config.ts - Role-based configuration using routes.ts
+ * - sidebar/icon-map.tsx - MUI icon exports
+ * - sidebar/sidebar-item.tsx - Navigation item component
+ * - sidebar/widgets/ - Extracted widget components
+ * - sidebar/sidebar.tsx - Main component
+ * 
+ * Changes from original:
+ * 1. Replaced string-based icons with MUI component imports
+ * 2. Uses useAuth from auth-provider for user data (not props)
+ * 3. Routes imported from lib/routes.ts (single source of truth)
+ * 4. Added logout button for authenticated users
+ * 5. Organizer widgets use OrganizerContext for real data
+ * 6. Extracted widgets into separate files
+ */
 
-import Link from 'next/link';
-import { useState } from 'react';
-
-export function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true);
-
-  return (
-    <aside
-      className={`bg-gray-800 text-white h-screen flex flex-col transition-all duration-300 ${
-        isOpen ? 'w-64' : 'w-20'
-      }`}
-    >
-      <div className="p-6 border-b border-gray-700 flex items-center justify-between">
-        {isOpen && <span className="font-bold text-lg">Menu</span>}
-        <button onClick={() => setIsOpen(!isOpen)} className="text-white">
-          ☰
-        </button>
-      </div>
-      <nav className="flex-1 px-4 py-6">
-        <ul className="space-y-4">
-          <li>
-            <Link href="/dashboard" className="block p-2 hover:bg-gray-700 rounded">
-              {isOpen ? 'Dashboard' : '📊'}
-            </Link>
-          </li>
-          <li>
-            <Link href="/dashboard/events" className="block p-2 hover:bg-gray-700 rounded">
-              {isOpen ? 'Events' : '📅'}
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </aside>
-  );
-}
+// Re-export everything from the modular sidebar
+export * from './sidebar/index';
+export { default } from './sidebar/index';
