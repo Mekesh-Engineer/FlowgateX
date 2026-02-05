@@ -1955,20 +1955,6 @@ const CTASection = () => {
             </Link>
           </div>
 
-          {/* Trust Badges */}
-          <div className="flex flex-wrap justify-center gap-6 mt-12 pt-8 border-t border-[var(--border-primary)]">
-            {[
-              { icon: Shield, label: '256-bit SSL' },
-              { icon: Award, label: 'Award Winning' },
-              { icon: Clock, label: '24/7 Support' },
-              { icon: CheckCircle, label: '99.9% Uptime' },
-            ].map((badge, idx) => (
-              <div key={idx} className="flex items-center gap-2 text-[var(--text-muted)] text-sm">
-                <badge.icon size={16} className="text-[#A3D639]" />
-                {badge.label}
-              </div>
-            ))}
-          </div>
         </motion.div>
       </div>
     </section>

@@ -1,0 +1,285 @@
+/* =============================================================================
+   NAVBAR STYLES
+   Additional styles for the Navbar component
+   ========================================================================== */
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Navbar glass effect enhancement */
+.navbar-glass {
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Active link indicator animation */
+@keyframes navIndicatorPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.nav-indicator {
+    animation: navIndicatorPulse 2s ease-in-out infinite;
+}
+
+/* Mega menu category hover effect */
+.mega-menu-category {
+    position: relative;
+}
+
+.mega-menu-category::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #00A3DB, #A3D639);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.mega-menu-category:hover::before {
+    transform: scaleY(1);
+}
+
+/* Notification badge pulse animation */
+@keyframes notificationPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.notification-badge {
+    animation: notificationPulse 2s ease-in-out infinite;
+}
+
+/* Search modal backdrop blur */
+.search-backdrop {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Mobile menu slide animation enhancement */
+.mobile-menu-enter {
+    transform: translateX(100%);
+}
+
+.mobile-menu-enter-active {
+    transform: translateX(0);
+    transition: transform 300ms ease-out;
+}
+
+.mobile-menu-exit {
+    transform: translateX(0);
+}
+
+.mobile-menu-exit-active {
+    transform: translateX(100%);
+    transition: transform 200ms ease-in;
+}
+
+/* Dropdown shadow enhancement */
+.dropdown-shadow {
+    box-shadow:
+        0 10px 40px -10px rgba(0, 0, 0, 0.2),
+        0 0 0 1px var(--border-primary);
+}
+
+/* Theme toggle rotation */
+.theme-toggle-icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-icon.dark {
+    transform: rotate(180deg);
+}
+
+/* Focus visible styles for accessibility */
+.nav-focusable:focus-visible {
+    outline: 2px solid #00A3DB;
+    outline-offset: 2px;
+}
+
+/* Keyboard shortcut styling */
+.kbd-shortcut {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 0.125rem 0.375rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 0 var(--border-primary);
+}
+
+/* Logo glow effect */
+.logo-glow {
+    position: relative;
+}
+
+.logo-glow::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(135deg, #00A3DB, #A3D639);
+    border-radius: 1rem;
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 0.3s ease;
+}
+
+.logo-glow:hover::before {
+    opacity: 0.4;
+}
+
+/* Menu item underline animation */
+.nav-link-underline {
+    position: relative;
+}
+
+.nav-link-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(to right, #00A3DB, #A3D639);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link-underline:hover::after {
+    width: 80%;
+}
+
+/* Active nav link */
+.nav-link-active {
+    color: #00A3DB;
+    background: rgba(0, 163, 219, 0.1);
+}
+
+/* Profile dropdown avatar ring */
+.avatar-ring {
+    position: relative;
+}
+
+.avatar-ring::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, #00A3DB, #A3D639);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.avatar-ring:hover::before {
+    opacity: 1;
+}
+
+.avatar-ring img {
+    position: relative;
+    z-index: 1;
+}
+
+/* Mega menu fade-in animation for items */
+.mega-menu-item {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: megaMenuItemFadeIn 0.3s ease forwards;
+}
+
+@keyframes megaMenuItemFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mega-menu-item:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.mega-menu-item:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.mega-menu-item:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.mega-menu-item:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.mega-menu-item:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.mega-menu-item:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .mega-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .mega-menu-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dark mode specific enhancements */
+:root.dark .navbar-glass,
+html.dark .navbar-glass {
+    background: hsla(220, 40%, 8%, 0.9);
+}
+
+:root.dark .dropdown-shadow,
+html.dark .dropdown-shadow {
+    box-shadow:
+        0 10px 40px -10px rgba(0, 0, 0, 0.5),
+        0 0 0 1px var(--border-primary);
+}
+
+/* Smooth transitions for theme switching */
+.navbar-transition {
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
