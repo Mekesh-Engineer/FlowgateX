@@ -391,7 +391,7 @@ export default function UserProfile() {
                     {['light', 'dark', 'system'].map((theme) => (
                       <div 
                         key={theme}
-                        onClick={() => setFormData(p => ({p, theme}))}
+                        onClick={() => setFormData(p => ({...p, theme: theme as 'light' | 'dark' | 'system'}))}
                         className={cn(
                           "cursor-pointer rounded-xl border-2 p-4 flex flex-col items-center gap-3 transition-all hover:bg-gray-50 dark:hover:bg-neutral-700/50",
                           formData.theme === theme 

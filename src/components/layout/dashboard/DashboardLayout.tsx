@@ -140,7 +140,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // ── State ──────────────────────────────────────────────────────────────
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false); // desktop collapsed (icon-only) mode
+  const [isCollapsed, _setIsCollapsed] = useState(false); // desktop collapsed (icon-only) mode
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [calendarModalOpen, setCalendarModalOpen] = useState(false);
   const [cartModalOpen, setCartModalOpen] = useState(false);

@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, User, LogIn, Ticket, Bell, Sun, Moon, 
-  Search, ChevronDown, Settings, LogOut, Calendar,
+  Search, ChevronDown, LogOut, Calendar,
   Music, Trophy, Cpu, Palette, MapPin, Star, Zap,
   ArrowRight, Clock, Users, Heart, TrendingUp,
   Gamepad2, Award,

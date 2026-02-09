@@ -16,10 +16,9 @@ import {
   TrendingDown,
   Bell,
   ChevronRight,
-  Filter,
-  Loader2
+  Filter
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Button from '@/components/common/Button';
 import { Card, CardContent } from '@/components/common/Card';
@@ -163,7 +162,6 @@ const QUICK_ACTIONS = [
 export default function UserDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   // Dynamic Data Fetching Effect
   useEffect(() => {
@@ -186,7 +184,6 @@ export default function UserDashboard() {
     if (container) {
       const scrollAmount = direction === 'left' ? -320 : 320;
       container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      setScrollPosition(container.scrollLeft + scrollAmount);
     }
   };
 
@@ -369,7 +366,7 @@ export default function UserDashboard() {
               <Button size="sm" variant="ghost" className="text-slate-500 hover:text-slate-700 dark:text-neutral-400">
                 <Filter size={16} className="mr-2" /> Filter
               </Button>
-              <Button size="sm" variant="outline" className="border-slate-200 dark:border-neutral-700">
+              <Button size="sm" variant="secondary" className="border-slate-200 dark:border-neutral-700">
                 View All
               </Button>
             </div>
