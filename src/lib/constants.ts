@@ -8,6 +8,7 @@ export enum UserRole {
   USER = 'user',
   ORGANIZER = 'organizer',
   ADMIN = 'admin',
+  SUPER_ADMIN = 'superadmin',
 }
 
 // Event Categories
@@ -80,7 +81,7 @@ export const NAV_ITEMS = {
     { label: 'Dashboard', path: '/dashboard', icon: 'LayoutDashboard' },
     { label: 'My Tickets', path: '/dashboard/tickets', icon: 'Ticket' },
     { label: 'Event Catalog', path: '/events', icon: 'Calendar' },
-    { label: 'Profile Settings', path: '/dashboard/settings', icon: 'Settings' },
+    { label: 'Profile', path: '/profile', icon: 'User' },
     { label: 'Support', path: '/support', icon: 'HelpCircle' },
   ],
   organizer: [

@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
+import { Layout } from '@/components/layout/Mainlayout';
+import DashboardLayout from '@/components/layout/dashboard/DashboardLayout';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ProtectedRoute from './ProtectedRoute';
 import RoleRoute from './RoleRoute';
@@ -11,27 +12,68 @@ import {
   protectedRoutes,
   organizerRoutes,
   adminRoutes,
+  superAdminRoutes,
   fallbackRoute,
 } from './routes.config';
+
+// =============================================================================
+// APP ROUTES COMPONENT
+// =============================================================================
+// Main routing configuration with role-based access control
+//
+// Route Categories:
+// 1. Public Routes - Available to everyone (with Layout)
+// 2. Auth Routes - Login/Register pages (no Layout)
+// 3. Protected Routes - Authenticated users only (with DashboardLayout)
+// 4. Organizer Routes - Organizers, Admins, Super Admins
+// 5. Admin Routes - Admins and Super Admins
+// 6. Super Admin Routes - Super Admins only
+//
+// Test Credentials:
+// - User: mekesh.officials@gmail.com / Mekesh@attendee1236
+// - Organizer: mekeshkumarm.23eee@kongu.edu / Mekesh@organizer1236
+// - Admin: mekeshkumar1236@gmail.com / Mekesh@admin1236
+// - Super Admin: mekesh.engineer@gmail.com / Mekesh@superadmin1236
+// =============================================================================
 
 function AppRoutes() {
   return (
     <Suspense fallback={<LoadingSpinner fullScreen message="Loading page..." />}>
       <Routes>
-        {/* Public routes with Layout */}
+        {/* ═══════════════════════════════════════════════════════════════
+            PUBLIC ROUTES
+            Layout: MainLayout (with Navbar & Footer)
+            Access: Everyone
+            Routes: Home, About, Contact, Events, Event Details
+            ═══════════════════════════════════════════════════════════════ */}
         <Route element={<Layout />}>
           {publicRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
 
-        {/* Auth routes without Layout */}
+        {/* ═══════════════════════════════════════════════════════════════
+            AUTH ROUTES
+            Layout: None (full-page auth screens)
+            Access: Unauthenticated users only
+            Routes: Login, Register, Forgot Password
+            ═══════════════════════════════════════════════════════════════ */}
         {authRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.element} />
         ))}
 
-        {/* Protected routes with Layout */}
-        <Route element={<Layout />}>
+        {/* ═══════════════════════════════════════════════════════════════
+            ALL DASHBOARD ROUTES (Single DashboardLayout instance)
+            Layout: DashboardLayout
+            Access: Role-based per route
+            
+            Using a single DashboardLayout wrapper prevents unnecessary
+            remounts when navigating between different role-based pages
+            (e.g., /profile, /organizer, /admin). Each child route still
+            has its own access control guard.
+            ═══════════════════════════════════════════════════════════════ */}
+        <Route element={<DashboardLayout />}>
+          {/* User/Attendee routes — all authenticated users */}
           {protectedRoutes.map((route) => (
             <Route
               key={route.path}
@@ -39,16 +81,46 @@ function AppRoutes() {
               element={<ProtectedRoute>{route.element}</ProtectedRoute>}
             />
           ))}
-        </Route>
 
-        {/* Organizer routes with Layout */}
-        <Route element={<Layout />}>
+          {/* Organizer routes — organizer, admin, superadmin */}
           {organizerRoutes.map((route) => (
             <Route
               key={route.path}
               path={route.path}
               element={
-                <RoleRoute allowedRoles={[UserRole.ORGANIZER, UserRole.ADMIN]}>
+                <RoleRoute
+                  allowedRoles={[
+                    UserRole.ORGANIZER,
+                    UserRole.ADMIN,
+                    UserRole.SUPER_ADMIN,
+                  ]}
+                >
+                  {route.element}
+                </RoleRoute>
+              }
+            />
+          ))}
+
+          {/* Admin routes — admin, superadmin */}
+          {adminRoutes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <RoleRoute allowedRoles={[UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+                  {route.element}
+                </RoleRoute>
+              }
+            />
+          ))}
+
+          {/* Super Admin routes — superadmin only */}
+          {superAdminRoutes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <RoleRoute allowedRoles={[UserRole.SUPER_ADMIN]}>
                   {route.element}
                 </RoleRoute>
               }
@@ -56,20 +128,12 @@ function AppRoutes() {
           ))}
         </Route>
 
-        {/* Admin routes with Layout */}
-        <Route element={<Layout />}>
-          {adminRoutes.map((route) => (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={
-                <RoleRoute allowedRoles={[UserRole.ADMIN]}>{route.element}</RoleRoute>
-              }
-            />
-          ))}
-        </Route>
-
-        {/* 404 fallback */}
+        {/* ═══════════════════════════════════════════════════════════════
+            FALLBACK ROUTE (404)
+            Layout: MainLayout
+            Access: Everyone
+            Route: Any unmatched paths
+            ═══════════════════════════════════════════════════════════════ */}
         <Route element={<Layout />}>
           <Route path={fallbackRoute.path} element={fallbackRoute.element} />
         </Route>

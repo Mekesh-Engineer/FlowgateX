@@ -1,6 +1,17 @@
+// =============================================================================
+// DEPENDENCIES & IMPORTS
+// =============================================================================
+
+// React core imports
 import { ReactNode, useEffect, useState, useCallback } from 'react';
+
+// React Router for navigation
 import { useLocation, Outlet } from 'react-router-dom';
+
+// Animation library
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Internal layout components
 import Navbar from './Navbar';
 import Footer from './Footer';
 
@@ -8,7 +19,7 @@ import Footer from './Footer';
 // TYPES & INTERFACES
 // =============================================================================
 
-interface MainLayoutProps {
+export interface MainLayoutProps {
   /** Content to render - if not provided, uses Outlet for nested routes */
   children?: ReactNode;
   /** Whether to show the navbar */
@@ -189,6 +200,7 @@ export function AuthLayout({ children, ...props }: Omit<MainLayoutProps, 'showNa
   );
 }
 
+
 /** Layout for minimal pages - navbar only */
 export function MinimalLayout({ children, ...props }: Omit<MainLayoutProps, 'showFooter'>) {
   return (
@@ -198,4 +210,48 @@ export function MinimalLayout({ children, ...props }: Omit<MainLayoutProps, 'sho
   );
 }
 
+/** Default Layout component for public pages with navbar, footer, and transitions */
+export function Layout() {
+  return (
+    <MainLayout 
+      showNavbar={true}
+      showFooter={true}
+      enableTransitions={true}
+      scrollToTop={true}
+    >
+      <Outlet />
+    </MainLayout>
+  );
+}
+
+// =============================================================================
+// DEFAULT EXPORT
+// =============================================================================
+
 export default MainLayout;
+
+// =============================================================================
+// FILE CONNECTIONS SUMMARY
+// =============================================================================
+
+/**
+ * This file provides all layout components for the FlowGateX application:
+ * 
+ * MAIN COMPONENTS:
+ * - MainLayout: Core layout with configurable navbar/footer
+ * - Layout: Default public layout (navbar + footer + transitions)
+ * - PublicLayout: Specialized for public pages  
+ * - AuthLayout: Minimal layout for authentication pages
+ * - MinimalLayout: Layout with navbar only
+ * 
+ * USAGE:
+ * import { Layout, MainLayout } from '@/components/layout/MainLayout';
+ * import Layout from '@/components/layout/Layout'; // re-exports from here
+ * 
+ * DEPENDENCIES:
+ * - Navbar component from './Navbar'
+ * - Footer component from './Footer' 
+ * - Framer Motion for page transitions
+ * - React Router for routing integration
+ */
+

@@ -10,7 +10,7 @@ import {
   orderBy,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getDb } from '@/lib/firebase';
 import type { Booking, CreateBookingData } from '../types/booking.types';
 import { BookingStatus } from '@/lib/constants';
 import { generateId } from '@/lib/utils';
@@ -20,7 +20,7 @@ const COLLECTION = 'bookings';
 // Get user bookings
 export const getUserBookings = async (userId: string): Promise<Booking[]> => {
   const q = query(
-    collection(db, COLLECTION),
+    collection(getDb(), COLLECTION),
     where('userId', '==', userId),
     orderBy('bookingDate', 'desc')
   );
@@ -31,7 +31,7 @@ export const getUserBookings = async (userId: string): Promise<Booking[]> => {
 
 // Get booking by ID
 export const getBookingById = async (id: string): Promise<Booking | null> => {
-  const docRef = doc(db, COLLECTION, id);
+  const docRef = doc(getDb(), COLLECTION, id);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
@@ -55,7 +55,7 @@ export const createBooking = async (
     qrCodes: Array.from({ length: ticket.quantity }, () => generateId(16)),
   }));
 
-  const docRef = await addDoc(collection(db, COLLECTION), {
+  const docRef = await addDoc(collection(getDb(), COLLECTION), {
     userId,
     eventId: data.eventId,
     eventTitle,
@@ -78,7 +78,7 @@ export const updateBookingStatus = async (
   status: BookingStatus,
   paymentId?: string
 ): Promise<void> => {
-  const docRef = doc(db, COLLECTION, id);
+  const docRef = doc(getDb(), COLLECTION, id);
   await updateDoc(docRef, {
     status,
     ...(paymentId && { paymentId }),

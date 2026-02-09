@@ -1,0 +1,723 @@
+/* =============================================================================
+   REGISTER PAGE — Feature-specific styles
+   =============================================================================
+   Extends login.css shared classes (.login-primary-btn, .login-primary-input,
+   .login-social-btn, .login-brand-logo, .login-theme-toggle, .login-orb, etc.)
+   with register-specific components.
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   Role Selector Tabs
+   --------------------------------------------------------------------------- */
+
+.register-role-tabs {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+    position: relative;
+}
+
+.register-role-tab {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.625rem 0.5rem;
+    border-radius: 0.625rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+
+.register-role-tab:hover:not(:disabled) {
+    color: var(--text-primary);
+}
+
+.register-role-tab--active {
+    color: var(--text-primary);
+}
+
+.register-role-tab:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Framer Motion layoutId pill */
+.register-role-pill {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.625rem;
+    background: var(--bg-base);
+    border: 1px solid var(--border-primary);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+/* ---------------------------------------------------------------------------
+   Step Progress
+   --------------------------------------------------------------------------- */
+
+.register-step-progress {
+    width: 100%;
+}
+
+.register-step-bar {
+    position: relative;
+    height: 0.25rem;
+    border-radius: 9999px;
+    background: var(--border-primary);
+    overflow: hidden;
+}
+
+.register-step-bar-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background: var(--color-primary);
+}
+
+.register-step-list {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    padding: 0;
+    list-style: none;
+}
+
+.register-step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.register-step-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    border: 1.5px solid var(--border-primary);
+    transition: all 0.3s ease;
+}
+
+.register-step-item--active .register-step-dot {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px hsl(var(--hue-primary) 100% 43% / 0.2);
+}
+
+.register-step-item--done .register-step-dot {
+    background: var(--color-success, hsl(142 71% 45%));
+    color: #fff;
+    border-color: var(--color-success, hsl(142 71% 45%));
+}
+
+.register-step-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: color 0.2s ease;
+}
+
+.register-step-item--active .register-step-label {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.register-step-item--done .register-step-label {
+    color: var(--color-success, hsl(142 71% 45%));
+}
+
+/* ---------------------------------------------------------------------------
+   Password Meter
+   --------------------------------------------------------------------------- */
+
+.register-pw-bar {
+    display: flex;
+    gap: 0.25rem;
+    height: 0.25rem;
+}
+
+.register-pw-bar-seg {
+    flex: 1;
+    border-radius: 9999px;
+    background: var(--border-primary);
+    transition: background 0.3s ease;
+}
+
+.register-pw-very-weak {
+    --pw-color: hsl(0 84% 60%);
+}
+
+.register-pw-weak {
+    --pw-color: hsl(25 95% 53%);
+}
+
+.register-pw-fair {
+    --pw-color: hsl(45 93% 47%);
+}
+
+.register-pw-strong {
+    --pw-color: hsl(142 71% 45%);
+}
+
+.register-pw-very-strong {
+    --pw-color: var(--color-primary);
+}
+
+.register-pw-bar-seg.register-pw-very-weak,
+.register-pw-bar-seg.register-pw-weak,
+.register-pw-bar-seg.register-pw-fair,
+.register-pw-bar-seg.register-pw-strong,
+.register-pw-bar-seg.register-pw-very-strong {
+    background: var(--pw-color);
+}
+
+p.register-pw-very-weak {
+    color: hsl(0 84% 60%);
+}
+
+p.register-pw-weak {
+    color: hsl(25 95% 53%);
+}
+
+p.register-pw-fair {
+    color: hsl(45 93% 47%);
+}
+
+p.register-pw-strong {
+    color: hsl(142 71% 45%);
+}
+
+p.register-pw-very-strong {
+    color: var(--color-primary);
+}
+
+/* ---------------------------------------------------------------------------
+   OTP Input
+   --------------------------------------------------------------------------- */
+
+.register-otp-row {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.register-otp-digit {
+    width: 3rem;
+    height: 3.5rem;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: 0.75rem;
+    border: 1.5px solid var(--border-primary);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s ease;
+    caret-color: var(--color-primary);
+}
+
+.register-otp-digit:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px hsl(var(--hue-primary) 100% 43% / 0.15);
+}
+
+.register-otp-digit--verified {
+    border-color: var(--color-success, hsl(142 71% 45%));
+    background: hsl(142 71% 45% / 0.06);
+}
+
+.register-otp-digit--error {
+    border-color: hsl(0 84% 60%);
+    animation: register-shake 0.4s ease-in-out;
+}
+
+.register-otp-digit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.register-otp-resend {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s ease;
+}
+
+.register-otp-resend:disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.register-otp-resend:hover:not(:disabled) {
+    opacity: 0.8;
+}
+
+/* ---------------------------------------------------------------------------
+   Confirmation Screen
+   --------------------------------------------------------------------------- */
+
+.register-confirmation-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 9999px;
+    background: hsl(var(--hue-primary) 100% 43% / 0.12);
+    color: var(--color-primary);
+}
+
+.register-confirmation-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-base);
+}
+
+.register-confirmation-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--color-primary);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px hsl(var(--hue-primary) 100% 43% / 0.35);
+}
+
+.register-confirmation-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px hsl(var(--hue-primary) 100% 43% / 0.45);
+}
+
+/* ---------------------------------------------------------------------------
+   Shake animation (OTP error)
+   --------------------------------------------------------------------------- */
+
+@keyframes register-shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-6px);
+    }
+
+    40% {
+        transform: translateX(6px);
+    }
+
+    60% {
+        transform: translateX(-4px);
+    }
+
+    80% {
+        transform: translateX(4px);
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   Shared Input — register-input
+   --------------------------------------------------------------------------- */
+
+.register-input {
+    width: 100%;
+    padding: 0.75rem 0.875rem;
+    border-radius: 0.75rem;
+    border: 1.5px solid var(--border-primary);
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    caret-color: var(--color-primary);
+}
+
+.register-input::placeholder {
+    color: var(--text-muted);
+}
+
+.register-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px hsl(var(--hue-primary) 100% 43% / 0.15);
+}
+
+.register-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* With left icon — add left padding */
+.register-input--icon {
+    padding-left: 2.75rem;
+}
+
+/* With right icon (toggle, etc.) — add right padding */
+.register-input--pr-icon {
+    padding-right: 2.75rem;
+}
+
+/* Error state */
+.register-input--error {
+    border-color: hsl(0 84% 60%);
+}
+
+.register-input--error:focus {
+    border-color: hsl(0 84% 60%);
+    box-shadow: 0 0 0 3px hsl(0 84% 60% / 0.15);
+}
+
+/* Select variant */
+.register-input--select {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    padding-right: 2.25rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile Input
+   --------------------------------------------------------------------------- */
+
+.register-mobile-wrapper {
+    display: flex;
+    align-items: stretch;
+    border-radius: 0.75rem;
+    border: 1.5px solid var(--border-primary);
+    background: var(--bg-base);
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.register-mobile-wrapper:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px hsl(var(--hue-primary) 100% 43% / 0.15);
+}
+
+.register-mobile-wrapper--error {
+    border-color: hsl(0 84% 60%);
+}
+
+.register-mobile-wrapper--error:focus-within {
+    border-color: hsl(0 84% 60%);
+    box-shadow: 0 0 0 3px hsl(0 84% 60% / 0.15);
+}
+
+.register-mobile-country {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+
+.register-mobile-country:hover:not(:disabled) {
+    background: var(--bg-card);
+}
+
+.register-mobile-divider {
+    width: 1px;
+    align-self: stretch;
+    margin: 0.5rem 0;
+    background: var(--border-primary);
+}
+
+.register-mobile-input {
+    flex: 1;
+    padding: 0.75rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    background: transparent;
+    border: none;
+    outline: none;
+    caret-color: var(--color-primary);
+    min-width: 0;
+}
+
+.register-mobile-input::placeholder {
+    color: var(--text-muted);
+}
+
+.register-mobile-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Country dropdown */
+.register-mobile-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 50;
+    min-width: 14rem;
+    max-height: 16rem;
+    overflow-y: auto;
+    margin-top: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-surface);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.2);
+}
+
+.register-mobile-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    text-align: left;
+}
+
+.register-mobile-option:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.register-mobile-option--active {
+    background: hsl(var(--hue-primary) 100% 43% / 0.1);
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------------
+   Gender Select (segmented pills)
+   --------------------------------------------------------------------------- */
+
+.register-gender-group {
+    display: flex;
+    gap: 0.375rem;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-primary);
+}
+
+.register-gender-pill {
+    position: relative;
+    flex: 1;
+    padding: 0.5rem 0.25rem;
+    border-radius: 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+
+.register-gender-pill:hover:not(:disabled) {
+    color: var(--text-primary);
+}
+
+.register-gender-pill--active {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.register-gender-pill:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Framer Motion animated background pill */
+.register-gender-pill-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.625rem;
+    background: var(--bg-base);
+    border: 1px solid var(--border-primary);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+/* ---------------------------------------------------------------------------
+   Review Screen
+   --------------------------------------------------------------------------- */
+
+.register-review {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.register-review-section {
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-base);
+}
+
+.register-review-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.register-review-title {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.register-review-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.register-review-edit:hover:not(:disabled) {
+    background: hsl(var(--hue-primary) 100% 43% / 0.08);
+}
+
+.register-review-edit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.register-review-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.625rem 1rem;
+}
+
+.register-review-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.register-review-field dt {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.register-review-field dd {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+    word-break: break-word;
+}
+
+.register-review-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.register-review-badge--success {
+    background: hsl(142 71% 45% / 0.12);
+    color: var(--color-success, hsl(142 71% 45%));
+}
+
+.register-review-badge--pending {
+    background: hsl(45 93% 47% / 0.12);
+    color: hsl(45 93% 47%);
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive tweaks
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 480px) {
+    .register-otp-digit {
+        width: 2.5rem;
+        height: 3rem;
+        font-size: 1.125rem;
+    }
+
+    .register-role-tab {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.25rem;
+    }
+
+    .register-gender-pill {
+        font-size: 0.6875rem;
+        padding: 0.375rem 0.125rem;
+    }
+
+    .register-review-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .register-mobile-dropdown {
+        min-width: 100%;
+    }
+}

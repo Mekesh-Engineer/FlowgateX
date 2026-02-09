@@ -60,6 +60,22 @@ if (firebaseEnabled) {
 // Export Firebase services (will be null in mock mode)
 export { auth, db, storage };
 
+// Helper to get Firestore with runtime null check
+export const getDb = (): Firestore => {
+  if (!db) {
+    throw new Error('Firestore is not initialized. Make sure Firebase is properly configured.');
+  }
+  return db;
+};
+
+// Helper to get Auth with runtime null check
+export const getAuthInstance = (): Auth => {
+  if (!auth) {
+    throw new Error('Firebase Auth is not initialized. Make sure Firebase is properly configured.');
+  }
+  return auth;
+};
+
 // Auth providers (only create if Firebase is enabled)
 export const googleProvider = firebaseEnabled ? new GoogleAuthProvider() : null;
 export const facebookProvider = firebaseEnabled ? new FacebookAuthProvider() : null;

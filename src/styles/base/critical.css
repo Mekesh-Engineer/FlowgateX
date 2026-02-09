@@ -1,0 +1,215 @@
+/* =============================================================================
+   CRITICAL CSS — Pre-React Boot Styles
+   =============================================================================
+   This file is linked directly from index.html so it loads BEFORE any JS.
+   It provides the minimal styles for the loading spinner, skip-link, and
+   noscript fallback.  All colour values are defined as CSS custom properties
+   here and intentionally mirror the tokens in variables.css.
+
+   ⚠  Keep this file as small as possible — every byte delays FCP.
+   ⚠  When you change a colour in variables.css, update the matching token
+      below so they stay in sync.
+
+   Token mapping (critical → variables.css):
+     --critical-bg          ↔  --bg-base  (dark mode value: hsl(220,40%,8%))
+     --critical-text        ↔  --text-primary (dark mode: hsl(0,0%,98%))
+     --critical-text-muted  ↔  --text-muted   (dark mode: hsl(220,15%,60%))
+     --critical-accent      ↔  --color-primary (hsl(195,100%,43%) ≈ #00A3DB)
+     --critical-error       ↔  --color-error   (hsl(0,84%,60%)   ≈ #ef4444)
+   ============================================================================= */
+
+/* -------------------------------------------------------------------------- */
+/*  1. Critical Design Tokens                                                 */
+/* -------------------------------------------------------------------------- */
+:root {
+    /* Background — matches dark-mode --bg-base fallback */
+    --critical-bg: #0a0a0a;
+
+    /* Typography */
+    --critical-text: #fafafa;
+    --critical-text-muted: rgba(255, 255, 255, 0.6);
+    --critical-font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+
+    /* Brand / accent — KEC Cyan-Blue primary */
+    --critical-accent: hsl(195, 100%, 43%);
+    /* #00A3DB */
+
+    /* Error / theme-color reference */
+    --critical-error: hsl(0, 84%, 60%);
+    /* #ef4444 */
+
+    /* Spinner track */
+    --critical-spinner-track: rgba(255, 255, 255, 0.1);
+
+    /* Skip-link */
+    --critical-skip-bg: var(--critical-accent);
+    --critical-skip-text: #ffffff;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  2. Critical Base Styles                                                   */
+/* -------------------------------------------------------------------------- */
+html,
+body {
+    background-color: var(--critical-bg);
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    width: 100%;
+    font-family: var(--critical-font-stack);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--critical-text);
+    overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  3. Skip-to-Content Link (Accessibility)                                   */
+/* -------------------------------------------------------------------------- */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--critical-skip-bg);
+    color: var(--critical-skip-text);
+    padding: 12px 16px;
+    text-decoration: none;
+    z-index: 10000;
+    font-weight: 600;
+    border-radius: 0 0 4px 0;
+    transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 2px solid var(--critical-skip-text);
+    outline-offset: 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  4. Minimal Loader (visible until React mounts, then replaced)             */
+/* -------------------------------------------------------------------------- */
+.app-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    z-index: 9999;
+}
+
+.app-loader__spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--critical-spinner-track);
+    border-radius: 50%;
+    border-top-color: var(--critical-accent);
+    animation: critical-spin 0.8s ease-in-out infinite;
+    margin-bottom: 1rem;
+}
+
+.app-loader__text {
+    font-size: 0.9rem;
+    color: var(--critical-text-muted);
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    animation: critical-pulse 2s infinite;
+}
+
+@keyframes critical-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes critical-pulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  5. Reduced Motion                                                         */
+/* -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .skip-link {
+        transition: none;
+    }
+
+    .app-loader__spinner {
+        animation: none !important;
+        border-top-color: var(--critical-accent);
+        border-right-color: var(--critical-accent);
+    }
+
+    .app-loader__text {
+        animation: none !important;
+        opacity: 0.8;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  6. Noscript Fallback                                                      */
+/* -------------------------------------------------------------------------- */
+.noscript-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--critical-bg);
+    color: var(--critical-text);
+    font-family: var(--critical-font-stack);
+    text-align: center;
+    padding: 2rem;
+}
+
+.noscript-content {
+    max-width: 500px;
+}
+
+.noscript-content h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--critical-accent);
+}
+
+.noscript-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.noscript-content__help {
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.noscript-content__link {
+    color: var(--critical-accent);
+    text-decoration: none;
+}
+
+.noscript-content__link:hover,
+.noscript-content__link:focus {
+    text-decoration: underline;
+}

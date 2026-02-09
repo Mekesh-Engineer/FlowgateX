@@ -1,7 +1,7 @@
 import { Box, Container, Typography, Grid, Chip, Button, Skeleton } from '@mui/material';
-import { Calendar, MapPin, Users, Share2, Heart, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Share2, Heart, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { formatDate, formatDateTime, formatCurrency } from '@/lib/utils';
+import { formatDateTime, formatCurrency } from '@/lib/utils';
 import type { Event } from '../types/event.types';
 
 interface EventDetailsProps {

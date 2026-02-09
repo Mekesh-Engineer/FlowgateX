@@ -6,23 +6,40 @@
 // This service provides mock authentication for frontend-only development
 // Replace with real Firebase auth when backend is ready
 
-// Mock user data
-const MOCK_USERS: Record<string, any> = {
-  'demo@flowgatex.com': {
-    uid: 'mock-user-001',
-    email: 'demo@flowgatex.com',
-    displayName: 'Demo User',
-    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
+// Mock user data with hardcoded credentials for testing
+interface MockUserData {
+  uid: string;
+  email: string;
+  password: string;
+  displayName: string;
+  photoURL: string;
+  phoneNumber: string;
+  role: string;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const MOCK_USERS: Record<string, MockUserData> = {
+  // Attendee (User role)
+  'mekesh.officials@gmail.com': {
+    uid: 'mock-attendee-001',
+    email: 'mekesh.officials@gmail.com',
+    password: 'Mekesh@attendee1236',
+    displayName: 'Mekesh - Attendee',
+    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=attendee',
     phoneNumber: '+1234567890',
     role: 'user',
     emailVerified: true,
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date(),
   },
-  'organizer@flowgatex.com': {
+  // Organizer
+  'mekeshkumarm.23eee@kongu.edu': {
     uid: 'mock-organizer-001',
-    email: 'organizer@flowgatex.com',
-    displayName: 'Event Organizer',
+    email: 'mekeshkumarm.23eee@kongu.edu',
+    password: 'Mekesh@organizer1236',
+    displayName: 'Mekesh Kumar - Organizer',
     photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=organizer',
     phoneNumber: '+1234567891',
     role: 'organizer',
@@ -30,12 +47,64 @@ const MOCK_USERS: Record<string, any> = {
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date(),
   },
-  'admin@flowgatex.com': {
+  // Admin
+  'mekeshkumar1236@gmail.com': {
     uid: 'mock-admin-001',
-    email: 'admin@flowgatex.com',
-    displayName: 'Admin User',
+    email: 'mekeshkumar1236@gmail.com',
+    password: 'Mekesh@admin1236',
+    displayName: 'Mekesh Kumar - Admin',
     photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
     phoneNumber: '+1234567892',
+    role: 'admin',
+    emailVerified: true,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date(),
+  },
+  // Super Admin
+  'mekesh.engineer@gmail.com': {
+    uid: 'mock-superadmin-001',
+    email: 'mekesh.engineer@gmail.com',
+    password: 'Mekesh@superadmin1236',
+    displayName: 'Mekesh - Super Admin',
+    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=superadmin',
+    phoneNumber: '+1234567893',
+    role: 'superadmin',
+    emailVerified: true,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date(),
+  },
+  // Legacy demo users (for backward compatibility)
+  'demo@flowgatex.com': {
+    uid: 'mock-demo-001',
+    email: 'demo@flowgatex.com',
+    password: 'demo123',
+    displayName: 'Demo User',
+    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo',
+    phoneNumber: '+1234567894',
+    role: 'user',
+    emailVerified: true,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date(),
+  },
+  'organizer@flowgatex.com': {
+    uid: 'mock-demo-organizer-001',
+    email: 'organizer@flowgatex.com',
+    password: 'demo123',
+    displayName: 'Demo Organizer',
+    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demoorganizer',
+    phoneNumber: '+1234567895',
+    role: 'organizer',
+    emailVerified: true,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date(),
+  },
+  'admin@flowgatex.com': {
+    uid: 'mock-demo-admin-001',
+    email: 'admin@flowgatex.com',
+    password: 'demo123',
+    displayName: 'Demo Admin',
+    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demoadmin',
+    phoneNumber: '+1234567896',
     role: 'admin',
     emailVerified: true,
     createdAt: new Date('2024-01-01'),
@@ -63,19 +132,26 @@ class MockAuthService {
   }
 
   // Sign in with email/password (mock)
-  async signIn(email: string, _password: string): Promise<any> {
+  async signIn(email: string, password: string): Promise<any> {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const user = MOCK_USERS[email as keyof typeof MOCK_USERS];
     if (!user) {
-      throw new Error('Invalid credentials. Try: demo@flowgatex.com, organizer@flowgatex.com, or admin@flowgatex.com');
+      throw new Error('Invalid email or password. Please check your credentials and try again.');
     }
 
-    this.currentUser = user;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    // Validate password
+    if (user.password !== password) {
+      throw new Error('Invalid email or password. Please check your credentials and try again.');
+    }
+
+    // Don't include password in the stored user object
+    const { password: _, ...userWithoutPassword } = user;
+    this.currentUser = userWithoutPassword;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(userWithoutPassword));
     this.notifyListeners();
-    return user;
+    return userWithoutPassword;
   }
 
   // Sign up (mock)

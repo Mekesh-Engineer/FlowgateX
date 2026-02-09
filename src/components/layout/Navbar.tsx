@@ -10,6 +10,9 @@ import {
   Home, Info, Mail, HelpCircle, Shield, FileText,
   Sparkles, Command
 } from 'lucide-react';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { UserRole } from '@/lib/constants';
+import { logout } from '@/features/auth/services/authService';
 
 // =============================================================================
 // TYPES & INTERFACES
@@ -464,76 +467,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
   );
 };
 
-interface ProfileDropdownProps {
-  onClose: () => void;
-  onLogout: () => void;
-}
 
-const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ onClose, onLogout }) => {
-  const menuItems = [
-    { label: 'My Profile', icon: User, path: '/profile' },
-    { label: 'My Tickets', icon: Ticket, path: '/tickets' },
-    { label: 'Saved Events', icon: Heart, path: '/saved' },
-    { label: 'Settings', icon: Settings, path: '/settings' },
-  ];
-
-  return (
-    <motion.div
-      variants={dropdownVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      className="absolute top-full right-0 mt-2 w-64 bg-[var(--bg-card)] border border-[var(--border-primary)] rounded-2xl shadow-2xl overflow-hidden z-50"
-    >
-      {/* User Info */}
-      <div className="p-4 border-b border-[var(--border-primary)]">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80"
-              alt="User avatar"
-              className="w-12 h-12 rounded-full object-cover ring-2 ring-[#00A3DB]/20"
-            />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#10b981] border-2 border-[var(--bg-card)] rounded-full" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-[var(--text-primary)] truncate">John Doe</p>
-            <p className="text-xs text-[var(--text-muted)] truncate">john@example.com</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Menu Items */}
-      <div className="p-2">
-        {menuItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={onClose}
-            className="flex items-center gap-3 px-3 py-2.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-xl transition-all duration-200"
-          >
-            <item.icon size={18} />
-            <span className="font-medium">{item.label}</span>
-          </Link>
-        ))}
-      </div>
-
-      {/* Logout */}
-      <div className="p-2 border-t border-[var(--border-primary)]">
-        <button
-          onClick={() => {
-            onLogout();
-            onClose();
-          }}
-          className="flex items-center gap-3 w-full px-3 py-2.5 text-[#ef4444] hover:bg-[#ef4444]/10 rounded-xl transition-all duration-200"
-        >
-          <LogOut size={18} />
-          <span className="font-medium">Sign Out</span>
-        </button>
-      </div>
-    </motion.div>
-  );
-};
 
 interface ThemeToggleProps {
   isDark: boolean;
@@ -571,27 +505,28 @@ function Navbar() {
   const location = useLocation();
   
   // State
+  const { user, isAuthenticated } = useAuth();
+  
+  // State
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
+  const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      return document.documentElement.classList.contains('dark') ||
-        window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return localStorage.getItem('theme') || 'auto';
     }
-    return false;
+    return 'auto';
   });
   const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Refs
   const navRef = useRef<HTMLElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
-  const profileRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLDivElement>(null);
 
   // Computed values
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -622,8 +557,8 @@ function Navbar() {
       if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
         setIsNotificationsOpen(false);
       }
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false);
+      if (accountRef.current && !accountRef.current.contains(event.target as Node)) {
+        setAccountDropdownOpen(false);
       }
     };
 
@@ -655,28 +590,64 @@ function Navbar() {
   // ==========================================================================
 
   const handleThemeToggle = useCallback(() => {
-    const newIsDark = !isDarkMode;
-    setIsDarkMode(newIsDark);
-    
-    if (newIsDark) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
+    const newTheme = theme === 'light' ? 'dark' : 'light'; // Simple toggle for mobile, desktop has full menu
+    setTheme(newTheme);
+  }, [theme]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('light', 'dark');
+
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else if (theme === 'light') {
+      root.classList.add('light');
     } else {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        root.classList.add('dark');
+      }
     }
-    
-    localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
-  }, [isDarkMode]);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const handleMarkAllNotificationsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   }, []);
 
-  const handleLogout = useCallback(() => {
-    setIsLoggedIn(false);
+  const handleLogout = useCallback(async () => {
+    await logout();
     navigate('/');
+    setAccountDropdownOpen(false);
   }, [navigate]);
+
+  const toggleAccountDropdown = useCallback(() => {
+    setAccountDropdownOpen((prev) => !prev);
+    setIsNotificationsOpen(false);
+  }, []);
+
+  const getRoleDisplayName = useCallback(() => {
+    switch (user?.role) {
+      case UserRole.ADMIN:
+      case UserRole.SUPER_ADMIN:
+        return 'Admin';
+      case UserRole.ORGANIZER:
+        return 'Organizer';
+      default:
+        return 'Attendee';
+    }
+  }, [user]);
+
+  const getRoleBadgeClass = useCallback(() => {
+    switch (user?.role) {
+      case UserRole.ADMIN:
+      case UserRole.SUPER_ADMIN:
+        return 'is-admin';
+      case UserRole.ORGANIZER:
+        return 'is-organizer';
+      default:
+        return 'is-user';
+    }
+  }, [user]);
 
   // ==========================================================================
   // RENDER
@@ -707,8 +678,13 @@ function Navbar() {
                   className="absolute -inset-1 bg-gradient-to-r from-[#00A3DB] to-[#A3D639] rounded-xl opacity-0 group-hover:opacity-50 transition-opacity duration-300"
                   style={{ filter: 'blur(8px)' }}
                 />
-                <div className="relative bg-[var(--bg-secondary)] p-2 rounded-xl border border-[var(--border-primary)] group-hover:border-[#00A3DB]/50 transition-colors duration-200">
-                  <Ticket className="text-[#00A3DB]" size={20} />
+                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#00A3DB] via-[#0091c4] to-[#A3D639] flex items-center justify-center shadow-lg shadow-[#00A3DB]/25 group-hover:shadow-[#00A3DB]/40 transition-all duration-300 group-hover:scale-105">
+                  <span 
+                    className="material-symbols-outlined text-[20px] text-white font-semibold"
+                    style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}
+                  >
+                    stream
+                  </span>
                 </div>
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-[#00A3DB] to-[#A3D639] bg-clip-text text-transparent">
@@ -776,16 +752,16 @@ function Navbar() {
               </button>
 
               {/* Theme Toggle */}
-              <ThemeToggle isDark={isDarkMode} onToggle={handleThemeToggle} />
+              <ThemeToggle isDark={theme === 'dark'} onToggle={handleThemeToggle} />
 
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <>
                   {/* Notifications */}
                   <div ref={notificationsRef} className="relative">
                     <button
                       onClick={() => {
                         setIsNotificationsOpen(!isNotificationsOpen);
-                        setIsProfileOpen(false);
+                        setAccountDropdownOpen(false);
                       }}
                       className="relative p-2.5 rounded-xl bg-[var(--bg-secondary)] hover:bg-[var(--bg-hover)] border border-[var(--border-primary)] transition-all duration-200"
                       aria-label="Notifications"
@@ -810,37 +786,113 @@ function Navbar() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Profile */}
-                  <div ref={profileRef} className="relative">
-                    <button
-                      onClick={() => {
-                        setIsProfileOpen(!isProfileOpen);
-                        setIsNotificationsOpen(false);
-                      }}
-                      className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[var(--bg-hover)] transition-all duration-200"
-                      aria-label="User menu"
-                      aria-expanded={isProfileOpen}
-                    >
-                      <img
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80"
-                        alt="User avatar"
-                        className="w-8 h-8 rounded-xl object-cover ring-2 ring-[var(--border-primary)]"
-                      />
-                      <ChevronDown 
-                        size={14} 
-                        className={`text-[var(--text-muted)] transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`}
-                      />
-                    </button>
+                  {/* User Profile */}
+                  <li className="dash-header-item-right">
+                    <div className="flex items-center">
+                      {/* Desktop: Show name and role */}
+                      <div className="dash-user-info desktop-only">
+                        <span className="dash-user-name">
+                          {user?.displayName || 'Guest User'}
+                        </span>
+                        <span className={`dash-role-badge ${getRoleBadgeClass()}`}>
+                          {getRoleDisplayName()}
+                        </span>
+                      </div>
 
-                    <AnimatePresence>
-                      {isProfileOpen && (
-                        <ProfileDropdown
-                          onClose={() => setIsProfileOpen(false)}
-                          onLogout={handleLogout}
-                        />
-                      )}
-                    </AnimatePresence>
-                  </div>
+                      {/* Account Dropdown */}
+                      <div ref={accountRef} className="inline-flex relative text-start">
+                        <button
+                          id="hs-dnad"
+                          type="button"
+                          onClick={toggleAccountDropdown}
+                          className="dash-account-trigger"
+                          aria-haspopup="menu"
+                          aria-expanded={accountDropdownOpen}
+                          aria-label="User menu"
+                        >
+                          <img
+                            className="shrink-0 size-8 rounded-full border-2 border-[var(--border-primary)]"
+                            src={user?.photoURL || 'https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80'}
+                            alt={user?.displayName || 'User Avatar'}
+                          />
+                        </button>
+
+                        {/* Account Dropdown Panel */}
+                        <div
+                          className={`dash-dropdown-panel is-right is-wide ${accountDropdownOpen ? 'is-open' : ''}`}
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="hs-dnad"
+                        >
+                          <div className="dash-account-info">
+                            <span className="dash-account-name">
+                              {user?.displayName || 'Guest User'}
+                            </span>
+                            <p className="dash-account-email">
+                              {user?.email || 'No email'}
+                            </p>
+                            <span className={`dash-role-badge mt-1.5 ${getRoleBadgeClass()}`}>
+                              {getRoleDisplayName()}
+                            </span>
+                          </div>
+
+                          <div className="dash-theme-row">
+                            {/* Theme Switch/Toggle */}
+                            <div className="flex flex-wrap justify-between items-center gap-2">
+                              <span className="dash-theme-label">Theme</span>
+                              <div className="dash-theme-group">
+                                {/* Light */}
+                                <button
+                                  type="button"
+                                  onClick={() => setTheme('light')}
+                                  className={`dash-theme-btn ${theme === 'light' ? 'is-active' : ''}`}
+                                >
+                                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 3v1" /><path d="M12 20v1" /><path d="M3 12h1" /><path d="M20 12h1" /><path d="m18.364 5.636-.707.707" /><path d="m6.343 17.657-.707.707" /><path d="m5.636 5.636.707.707" /><path d="m17.657 17.657.707.707" /></svg>
+                                  <span className="sr-only">Default (Light)</span>
+                                </button>
+                                {/* Dark */}
+                                <button
+                                  type="button"
+                                  onClick={() => setTheme('dark')}
+                                  className={`dash-theme-btn ${theme === 'dark' ? 'is-active-dark' : ''}`}
+                                >
+                                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
+                                  <span className="sr-only">Dark</span>
+                                </button>
+                                {/* Auto */}
+                                <button
+                                  type="button"
+                                  onClick={() => setTheme('auto')}
+                                  className={`dash-theme-btn ${theme === 'auto' ? 'is-active' : ''}`}
+                                >
+                                  <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></svg>
+                                  <span className="sr-only">Auto (System)</span>
+                                </button>
+                              </div>
+                            </div>
+                            {/* End Theme Switch/Toggle */}
+                          </div>
+
+                          <div className="dash-dropdown-divider">
+                            <Link className="dash-account-menu-item" to="/profile" onClick={() => setAccountDropdownOpen(false)}>
+                              <svg className="shrink-0 mt-0.5 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                              Profile
+                            </Link>
+                            <Link className="dash-account-menu-item" to="/settings" onClick={() => setAccountDropdownOpen(false)}>
+                              <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
+                              Settings
+                            </Link>
+                            <button className="dash-account-menu-item w-full text-left" onClick={handleLogout}>
+                              <svg className="shrink-0 mt-0.5 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></svg>
+                              Log out
+                            </button>
+                          </div>
+                        </div>
+                        {/* End Account Dropdown Panel */}
+                      </div>
+                      {/* End Account Dropdown */}
+                    </div>
+                  </li>
                 </>
               ) : (
                 <>
@@ -867,7 +919,7 @@ function Navbar() {
 
             {/* Mobile Actions */}
             <div className="flex lg:hidden items-center gap-2">
-              <ThemeToggle isDark={isDarkMode} onToggle={handleThemeToggle} />
+              <ThemeToggle isDark={theme === 'dark'} onToggle={handleThemeToggle} />
               
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -1020,7 +1072,7 @@ function Navbar() {
               </div>
 
               {/* User Section (if logged in) */}
-              {isLoggedIn && (
+              {isAuthenticated && (
                 <div className="p-4 border-b border-[var(--border-primary)]">
                   <div className="flex items-center gap-3">
                     <img
@@ -1080,7 +1132,7 @@ function Navbar() {
 
               {/* Auth Buttons */}
               <div className="p-4 mt-auto border-t border-[var(--border-primary)]">
-                {isLoggedIn ? (
+                {isAuthenticated ? (
                   <div className="space-y-2">
                     <Link
                       to="/profile"

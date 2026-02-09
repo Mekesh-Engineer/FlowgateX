@@ -33,7 +33,11 @@ function BasicInfoStep({ data, onUpdate, onNext }: BasicInfoStepProps) {
   });
 
   const onSubmit = (formData: z.infer<typeof basicInfoSchema>) => {
-    onUpdate(formData);
+    onUpdate({
+      title: formData.title,
+      description: formData.description,
+      category: formData.category as CreateEventData['category'],
+    });
     onNext();
   };
 

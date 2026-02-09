@@ -8,8 +8,6 @@ function Checkout() {
   const { items, totalPrice, isLoading, initiateCheckout } = useCheckout();
   const [attendees, setAttendees] = useState<Attendee[]>([{ name: '', email: '', phone: '' }]);
 
-  const totalTickets = items.reduce((sum, item) => sum + item.quantity, 0);
-
   const updateAttendee = (index: number, field: keyof Attendee, value: string) => {
     const updated = [...attendees];
     updated[index] = { ...updated[index], [field]: value };

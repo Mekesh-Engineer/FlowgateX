@@ -14,6 +14,7 @@
    ============================================================================ */
 
 /* Base Styles */
+@import './base/critical.css';
 @import './base/variables.css';
 @import './base/reset.css';
 
@@ -25,8 +26,12 @@
 @import './components/tables.css';
 @import './components/charts.css';
 @import './components/monitoring.css';
+@import './components/calendar.css';
+@import './components/cart.css';
 
 /* Layout Styles */
+@import './layouts/navbar.css';
+@import './layouts/footer.css';
 @import './layouts/sidebar.css';
 @import './layouts/dashboard.css';
 

@@ -1,15 +1,15 @@
-import { useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import {
   Ticket, Search, Heart, Headphones, PlusCircle,
   LayoutDashboard, BarChart3, CreditCard, FileText,
   BookOpen, Code2, Puzzle, Info, Briefcase, Mail,
-  Newspaper, Apple, Smartphone, Facebook, Instagram,
-  Twitter, Youtube, Linkedin, ArrowUp, MapPin, Phone,
-  Clock, Send, ChevronRight, Sparkles, Globe, Shield,
-  Award, Zap, ExternalLink, Star
+  Newspaper, Facebook, Instagram,
+  Twitter, Youtube, Linkedin, ArrowUp, Phone,
+  Clock, Globe,
+  ExternalLink
 } from 'lucide-react';
 
 // =============================================================================
@@ -87,26 +87,11 @@ const SOCIAL_LINKS: SocialLink[] = [
   { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn', hoverColor: 'hover:bg-[#0A66C2] hover:border-[#0A66C2]' },
 ];
 
-const QUICK_NAV_LINKS = [
-  { label: 'Home', href: '/', scrollTo: 'hero' },
-  { label: 'Events', href: '/events', scrollTo: 'events' },
-  { label: 'Categories', href: '#categories', scrollTo: 'categories' },
-  { label: 'How It Works', href: '#how-it-works', scrollTo: 'how-it-works' },
-  { label: 'Testimonials', href: '#testimonials', scrollTo: 'testimonials' },
-];
-
 const LEGAL_LINKS = [
   { label: 'Privacy Policy', href: '/privacy' },
   { label: 'Terms of Service', href: '/terms' },
   { label: 'Cookie Settings', href: '/cookies' },
   { label: 'Accessibility', href: '/accessibility' },
-];
-
-const TRUST_BADGES = [
-  { icon: Shield, label: 'SSL Secured' },
-  { icon: Award, label: 'Award Winning' },
-  { icon: Zap, label: '99.9% Uptime' },
-  { icon: Globe, label: '120+ Countries' },
 ];
 
 // =============================================================================
@@ -144,74 +129,6 @@ const linkHoverVariants = {
 // SUB-COMPONENTS
 // =============================================================================
 
-interface NewsletterFormProps {
-  onSubmit: (email: string) => void;
-}
-
-const NewsletterForm: React.FC<NewsletterFormProps> = ({ onSubmit }) => {
-  const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    setIsSubmitted(true);
-    onSubmit(email);
-    setEmail('');
-
-    setTimeout(() => setIsSubmitted(false), 3000);
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="relative">
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Mail 
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" 
-            size={18} 
-          />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            className="w-full pl-11 pr-4 py-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[#00A3DB] focus:ring-2 focus:ring-[#00A3DB]/20 outline-none transition-all text-sm"
-            aria-label="Email address for newsletter"
-            disabled={isLoading}
-          />
-        </div>
-        <motion.button
-          type="submit"
-          disabled={isLoading || !email}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#00A3DB] to-[#007AA3] text-white font-semibold shadow-lg shadow-[#00A3DB]/25 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
-        >
-          {isLoading ? (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : isSubmitted ? (
-            <>
-              <Sparkles size={18} />
-              <span className="hidden sm:inline">Subscribed!</span>
-            </>
-          ) : (
-            <>
-              <Send size={18} />
-              <span className="hidden sm:inline">Subscribe</span>
-            </>
-          )}
-        </motion.button>
-      </div>
-    </form>
-  );
-};
-
 const ScrollToTopButton: React.FC = () => {
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -236,8 +153,6 @@ interface FooterLinkItemProps {
 }
 
 const FooterLinkItem: React.FC<FooterLinkItemProps> = ({ link, onNavigate }) => {
-  const navigate = useNavigate();
-
   const handleClick = (e: React.MouseEvent) => {
     if (link.scrollTo) {
       e.preventDefault();
@@ -297,18 +212,6 @@ export function Footer() {
   const footerRef = useRef<HTMLElement>(null);
   const isInView = useInView(footerRef, { once: true, margin: "-100px" });
 
-  const handleNewsletterSubmit = useCallback((email: string) => {
-    console.log('Newsletter subscription:', email);
-    // Handle newsletter submission
-  }, []);
-
-  const scrollToSection = useCallback((sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, []);
-
   return (
     <>
       <motion.footer
@@ -344,14 +247,17 @@ export function Footer() {
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <div className="absolute -inset-1 bg-gradient-to-r from-[#00A3DB] to-[#A3D639] rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-300" />
-                    <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-[#00A3DB] to-[#007AA3] flex items-center justify-center shadow-lg shadow-[#00A3DB]/25 group-hover:scale-105 transition-transform">
-                      <Ticket className="text-white" size={24} />
+                    <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-[#00A3DB] via-[#0091c4] to-[#A3D639] flex items-center justify-center shadow-lg shadow-[#00A3DB]/25 group-hover:scale-105 transition-transform">
+                      <span 
+                        className="material-symbols-outlined text-[24px] text-white font-semibold"
+                        style={{ fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24" }}
+                      >
+                        stream
+                      </span>
                     </div>
                   </div>
-                  <span className="text-2xl font-bold">
-                    <span className="text-[var(--text-primary)]">Flow</span>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00A3DB] to-[#A3D639]">Gate</span>
-                    <span className="text-[var(--text-primary)]">X</span>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-[#00A3DB] to-[#A3D639] bg-clip-text text-transparent">
+                    FlowGateX
                   </span>
                 </div>
               </Link>
@@ -408,7 +314,7 @@ export function Footer() {
             </motion.div>
 
             {/* Navigation Columns */}
-            {FOOTER_SECTIONS.map((section, sectionIndex) => (
+            {FOOTER_SECTIONS.map((section) => (
               <motion.div 
                 key={section.title} 
                 variants={itemVariants}

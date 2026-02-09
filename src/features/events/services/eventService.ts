@@ -14,7 +14,7 @@ import {
   DocumentSnapshot,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getDb } from '@/lib/firebase';
 import type { Event, EventFilters, CreateEventData } from '../types/event.types';
 import { EventStatus } from '@/lib/constants';
 
@@ -26,7 +26,7 @@ export const getEvents = async (
   pageLimit: number = 20,
   lastDoc?: DocumentSnapshot
 ) => {
-  let q = query(collection(db, COLLECTION));
+  let q = query(collection(getDb(), COLLECTION));
 
   // Apply filters
   if (filters.category) {
@@ -60,7 +60,7 @@ export const getEvents = async (
 
 // Get event by ID
 export const getEventById = async (id: string): Promise<Event | null> => {
-  const docRef = doc(db, COLLECTION, id);
+  const docRef = doc(getDb(), COLLECTION, id);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
@@ -72,7 +72,7 @@ export const getEventById = async (id: string): Promise<Event | null> => {
 // Get featured events
 export const getFeaturedEvents = async (count: number = 6): Promise<Event[]> => {
   const q = query(
-    collection(db, COLLECTION),
+    collection(getDb(), COLLECTION),
     where('featured', '==', true),
     where('status', '==', EventStatus.PUBLISHED),
     orderBy('dates.start', 'asc'),
@@ -86,7 +86,7 @@ export const getFeaturedEvents = async (count: number = 6): Promise<Event[]> => 
 // Get events by organizer
 export const getEventsByOrganizer = async (organizerId: string): Promise<Event[]> => {
   const q = query(
-    collection(db, COLLECTION),
+    collection(getDb(), COLLECTION),
     where('organizerId', '==', organizerId),
     orderBy('createdAt', 'desc')
   );
@@ -106,7 +106,7 @@ export const createEvent = async (
     available: tier.quantity,
   }));
 
-  const docRef = await addDoc(collection(db, COLLECTION), {
+  const docRef = await addDoc(collection(getDb(), COLLECTION), {
     ...data,
     ticketTiers,
     status: EventStatus.DRAFT,
@@ -120,7 +120,7 @@ export const createEvent = async (
 
 // Update event
 export const updateEvent = async (id: string, data: Partial<Event>): Promise<void> => {
-  const docRef = doc(db, COLLECTION, id);
+  const docRef = doc(getDb(), COLLECTION, id);
   await updateDoc(docRef, {
     ...data,
     updatedAt: serverTimestamp(),
@@ -129,7 +129,7 @@ export const updateEvent = async (id: string, data: Partial<Event>): Promise<voi
 
 // Delete event
 export const deleteEvent = async (id: string): Promise<void> => {
-  const docRef = doc(db, COLLECTION, id);
+  const docRef = doc(getDb(), COLLECTION, id);
   await deleteDoc(docRef);
 };
 

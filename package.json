@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "lint:html": "node scripts/lint-html-no-inline.mjs index.html",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
@@ -28,6 +29,7 @@
     "@reduxjs/toolkit": "^2.5.0",
     "@tanstack/react-query": "^5.62.8",
     "axios": "^1.7.9",
+    "canvas-confetti": "^1.9.4",
     "chart.js": "^4.5.1",
     "dayjs": "^1.11.13",
     "firebase": "^11.10.0",
@@ -51,6 +53,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/lodash": "^4.17.13",
     "@types/node": "^22.10.7",
     "@types/react": "^18.3.18",

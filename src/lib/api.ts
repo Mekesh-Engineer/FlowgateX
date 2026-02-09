@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { auth } from './firebase';
+import { getAuthInstance } from './firebase';
 
 /**
  * API Error Codes as per API Documentation
@@ -59,7 +59,7 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     try {
-      const user = auth.currentUser;
+      const user = getAuthInstance().currentUser;
       if (user) {
         const token = await user.getIdToken();
         config.headers.Authorization = `Bearer ${token}`;
@@ -90,7 +90,7 @@ api.interceptors.response.use(
     // Handle 401 - token expired
     if (error.response?.status === 401 && originalRequest) {
       try {
-        const user = auth.currentUser;
+        const user = getAuthInstance().currentUser;
         if (user) {
           // Force refresh the token
           const newToken = await user.getIdToken(true);

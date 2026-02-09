@@ -3,15 +3,17 @@
 /* Fonts are loaded via next/font/google in layout.tsx */
 
 /* ============================================================================
-   Material Icons - Google Fonts CDN
+   Material Icons & Symbols - Google Fonts CDN
    ============================================================================ */
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round|Material+Icons+Sharp');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 /* ============================================================================
    Import Modular Stylesheets (MUST come before @tailwind directives)
    ============================================================================ */
 
-/* Base Styles - Variables and Reset */
+/* Base Styles - Critical, Variables and Reset */
+@import '../styles/base/critical.css';
 @import '../styles/base/variables.css';
 @import '../styles/base/reset.css';
 
@@ -23,8 +25,12 @@
 @import '../styles/components/tables.css';
 @import '../styles/components/charts.css';
 @import '../styles/components/monitoring.css';
+@import '../styles/components/calendar.css';
+@import '../styles/components/cart.css';
 
 /* Layout Styles */
+@import '../styles/layouts/navbar.css';
+@import '../styles/layouts/footer.css';
 @import '../styles/layouts/sidebar.css';
 @import '../styles/layouts/dashboard.css';
 
@@ -35,6 +41,8 @@
 
 /* Feature-Specific Styles */
 @import '../styles/features/qr-scanner.css';
+@import '../styles/features/login.css';
+@import '../styles/features/register.css';
 
 /* ============================================================================
    Tailwind CSS Framework

@@ -1,6 +1,6 @@
 import { Box, Container } from '@mui/material';
 import ForgotPassword from '@/features/auth/components/ForgotPassword';
-import { Link } from 'react-router-dom';
+import { Logo } from '@/components/common/Logo';
 
 function ForgotPasswordPage() {
   return (
@@ -16,14 +16,7 @@ function ForgotPasswordPage() {
     >
       <Container maxWidth="sm">
         <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Link to="/">
-            <Box
-              component="img"
-              src="/favicon.svg"
-              alt="FlowGateX"
-              sx={{ width: 48, height: 48, mb: 2 }}
-            />
-          </Link>
+          <Logo size="lg" showText={true} useMui={true} linkToHome={true} />
         </Box>
 
         <Box

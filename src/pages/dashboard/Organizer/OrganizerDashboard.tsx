@@ -44,7 +44,7 @@ function OrganizerDashboard() {
                     <Typography variant="h4" sx={{ fontWeight: 700 }}>
                       {stat.value}
                     </Typography>
-                    <Typography variant="caption\" sx={{ color: 'success.main' }}>
+                    <Typography variant="caption" sx={{ color: 'success.main' }}>
                       {stat.change}
                     </Typography>
                   </Box>

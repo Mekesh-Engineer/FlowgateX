@@ -1,5 +1,5 @@
 import { Box, Typography, Button, Divider } from '@mui/material';
-import { CheckCircle, Download, Calendar, MapPin } from 'lucide-react';
+import { CheckCircle, Download, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
