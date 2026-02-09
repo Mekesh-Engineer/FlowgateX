@@ -61,14 +61,12 @@
   <meta name="twitter:image:alt" content="FlowGateX Event Management Platform" />
   <meta name="twitter:creator" content="@flowgatex" />
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <!-- PWA Manifest (VitePWA generates manifest.webmanifest in production) -->
+  <link rel="manifest" href="/manifest.json" />
 
-  <!-- Security Headers -->
-  <!-- Note: CSP is configured in vite.config.ts for development/production -->
+  <!-- Security Headers (Note: Most security headers must be set via HTTP headers, not meta tags) -->
+  <!-- CSP is configured in vite.config.ts for development and netlify.toml for production -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
-  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(self)" />
 
