@@ -126,9 +126,10 @@ function validateStep1(data: FormData): FormErrors {
   const errors: FormErrors = {};
   if (!data.firstName.trim()) errors.firstName = 'First name is required.';
   if (!data.lastName.trim()) errors.lastName = 'Last name is required.';
-  if (!data.email.trim()) {
+  const emailTrimmed = data.email.trim();
+  if (!emailTrimmed) {
     errors.email = 'Email address is required.';
-  } else if (!EMAIL_REGEX.test(data.email)) {
+  } else if (!EMAIL_REGEX.test(emailTrimmed)) {
     errors.email = 'Please enter a valid email address.';
   }
   const dobErr = validateDob(data.dob);
@@ -193,6 +194,7 @@ export default function RegisterPage() {
   // Multi-step state
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
+  const [hasNavigated, setHasNavigated] = useState(false);
 
   // Role
   const [role, setRole] = useState<SignupRole>('attendee');
@@ -274,8 +276,10 @@ export default function RegisterPage() {
         };
       case 3:
         return {
-          title: 'Verify your identity',
-          subtitle: 'Confirm your email and complete setup.',
+          title: needsAuthCode ? 'Verify your identity' : 'Almost there!',
+          subtitle: needsAuthCode
+            ? 'Enter your organization details and authorization code.'
+            : 'Review your info before creating your account.',
         };
       case 4:
         return {
@@ -285,7 +289,7 @@ export default function RegisterPage() {
       default:
         return { title: '', subtitle: '' };
     }
-  }, [step]);
+  }, [step, needsAuthCode]);
 
   // ---------------------------------------------------------------------------
   // Role change handler
@@ -304,6 +308,7 @@ export default function RegisterPage() {
   const goToStep = useCallback(
     (target: number) => {
       setDirection(target > step ? 1 : -1);
+      setHasNavigated(true);
       setStep(target);
     },
     [step],
@@ -363,8 +368,8 @@ export default function RegisterPage() {
 
   // Note: Email/Phone OTP handlers removed - verification happens via Firebase link after account creation
 
-  const handleValidateAuthCode = useCallback(async () => {
-    if (!formData.authorizationCode.trim()) return;
+  const handleValidateAuthCode = useCallback(async (): Promise<boolean> => {
+    if (!formData.authorizationCode.trim()) return false;
     setLoading(true);
     try {
       await validateAuthCode({
@@ -373,6 +378,7 @@ export default function RegisterPage() {
       });
       setAuthCodeValidated(true);
       trackAuthCodeValidated(role, true);
+      return true;
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
       const errCode = error.code as RegistrationErrorCode | undefined;
@@ -384,6 +390,7 @@ export default function RegisterPage() {
       });
       setTouched((prev) => ({ ...prev, authorizationCode: true }));
       trackAuthCodeValidated(role, false);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -406,9 +413,12 @@ export default function RegisterPage() {
       }
 
       // Validate auth code if needed (for organizer/admin roles)
-      if (needsAuthCode && !authCodeValidated) {
-        await handleValidateAuthCode();
-        if (!authCodeValidated) return;
+      if (needsAuthCode) {
+        if (!authCodeValidated) {
+          // Auto-validate the auth code if user hasn't done it yet
+          const isValid = await handleValidateAuthCode();
+          if (!isValid) return; // Use return value, not stale state
+        }
       }
 
       setErrors({});
@@ -526,7 +536,9 @@ export default function RegisterPage() {
   // Can advance from step 3?
   // ---------------------------------------------------------------------------
   // Email verification happens after account creation, so we don't block on it
-  const step3CanAdvance = !needsAuthCode || authCodeValidated;
+  // For organizer/admin: allow submit if auth code is filled (auto-validates on submit)
+  // or if already validated via the "Validate Code" button
+  const step3CanAdvance = !needsAuthCode || authCodeValidated || formData.authorizationCode.trim().length > 0;
 
   // ---------------------------------------------------------------------------
   // Render
@@ -587,7 +599,7 @@ export default function RegisterPage() {
         <div className="login-orb login-orb-2" />
 
         <div className="w-full max-w-[460px] relative z-10">
-          <AnimatePresence mode="wait" custom={direction} initial={false}>
+          <AnimatePresence mode="wait" custom={direction}>
             {/* ================================================================
                 STEP 1 — Identity: Role + Name + Email + DOB
                 ================================================================ */}
@@ -596,7 +608,7 @@ export default function RegisterPage() {
                 key="step-1"
                 custom={direction}
                 variants={stepVariants}
-                initial="enter"
+                initial={hasNavigated ? 'enter' : false}
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -812,7 +824,7 @@ export default function RegisterPage() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
                 className="space-y-5"
               >
                 <StepProgress currentStep={2} />
@@ -1184,167 +1196,181 @@ export default function RegisterPage() {
                   onSubmit={handleStep3Next}
                   noValidate
                 >
-                  {/* === Dynamic role-specific fields === */}
-                  <AnimatePresence mode="wait">
-                    {(role === 'organizer' || role === 'admin') && (
-                      <motion.div
-                        key={`role-fields-${role}`}
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden space-y-4"
-                      >
-                        {/* Organization (Organizer only) */}
-                        {role === 'organizer' && (
-                          <div className="space-y-1.5">
-                            <label
-                              className="block text-sm font-semibold text-[var(--text-primary)]"
-                              htmlFor="reg-organization"
-                            >
-                              Organization Name{' '}
-                              <span className="text-[var(--color-error)]">
-                                *
-                              </span>
-                            </label>
-                            <div className="relative">
-                              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
-                                <Building2 size={18} aria-hidden="true" />
-                              </div>
-                              <input
-                                id="reg-organization"
-                                name="organization"
-                                type="text"
-                                autoComplete="organization"
-                                value={formData.organization}
-                                onChange={(e) =>
-                                  handleField('organization', e.target.value)
-                                }
-                                onBlur={() => handleBlur('organization')}
-                                placeholder="Acme Corp"
-                                disabled={isDisabled}
-                                className={`register-input register-input--icon ${
-                                  touched.organization && errors.organization
-                                    ? 'register-input--error'
-                                    : ''
-                                }`}
-                              />
-                            </div>
-                            {fieldError('organization')}
-                          </div>
-                        )}
+                  {/* === Attendee: No role-specific fields, show summary === */}
+                  {role === 'attendee' && (
+                    <div className="rounded-xl border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 px-4 py-3">
+                      <p className="text-sm text-[var(--color-success)] font-medium">
+                        <CheckCircle2 size={14} className="inline mr-2 -mt-0.5" />
+                        No additional verification needed for attendee accounts.
+                        Review your details and submit to create your account.
+                      </p>
+                    </div>
+                  )}
 
-                        {/* Department (Organizer only) */}
-                        {role === 'organizer' && (
-                          <div className="space-y-1.5">
-                            <label
-                              className="block text-sm font-semibold text-[var(--text-primary)]"
-                              htmlFor="reg-department"
-                            >
-                              Department
-                            </label>
-                            <div className="relative">
-                              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
-                                <Briefcase size={18} aria-hidden="true" />
-                              </div>
-                              <select
-                                id="reg-department"
-                                name="department"
-                                value={formData.department}
-                                onChange={(e) =>
-                                  handleField('department', e.target.value)
-                                }
-                                disabled={isDisabled}
-                                className="register-input register-input--icon register-input--select"
-                              >
-                                <option value="" disabled>
-                                  Select Department
-                                </option>
-                                <option value="marketing">
-                                  Marketing & Events
-                                </option>
-                                <option value="hr">Human Resources</option>
-                                <option value="ops">Operations</option>
-                                <option value="engineering">Engineering</option>
-                                <option value="other">Other</option>
-                              </select>
-                            </div>
-                          </div>
-                        )}
+                  {/* === Dynamic role-specific fields (Organizer / Admin) === */}
+                  {(role === 'organizer' || role === 'admin') && (
+                    <motion.div
+                      key={`role-fields-${role}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="space-y-4"
+                    >
+                      {/* Debug/Confirmation of Role */}
+                      <p className="text-sm text-[var(--color-primary)] font-medium bg-[var(--color-primary)]/10 px-3 py-2 rounded-lg">
+                        <Building2 size={14} className="inline mr-2 -mt-0.5" />
+                        Registering as {role === 'admin' ? 'Administrator' : 'Event Organizer'}
+                      </p>
 
-                        {/* Authorization Code (Organizer + Admin) */}
+                      {/* Organization (Organizer only) */}
+                      {role === 'organizer' && (
                         <div className="space-y-1.5">
                           <label
                             className="block text-sm font-semibold text-[var(--text-primary)]"
-                            htmlFor="reg-auth-code"
+                            htmlFor="reg-organization"
                           >
-                            Authorization Code{' '}
-                            <span className="text-[var(--color-error)]">*</span>
+                            Organization Name{' '}
+                            <span className="text-[var(--color-error)]">
+                              *
+                            </span>
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
-                              <KeyRound size={18} aria-hidden="true" />
+                              <Building2 size={18} aria-hidden="true" />
                             </div>
                             <input
-                              id="reg-auth-code"
-                              name="authorizationCode"
+                              id="reg-organization"
+                              name="organization"
                               type="text"
-                              value={formData.authorizationCode}
+                              autoComplete="organization"
+                              value={formData.organization}
                               onChange={(e) =>
-                                handleField(
-                                  'authorizationCode',
-                                  e.target.value,
-                                )
+                                handleField('organization', e.target.value)
                               }
-                              onBlur={() => handleBlur('authorizationCode')}
-                              placeholder={
-                                role === 'admin'
-                                  ? 'ADMIN-2026-FLOWGATEX'
-                                  : 'ORG-KEC-2026'
-                              }
+                              onBlur={() => handleBlur('organization')}
+                              placeholder="Acme Corp"
                               disabled={isDisabled}
                               className={`register-input register-input--icon ${
-                                touched.authorizationCode &&
-                                errors.authorizationCode
+                                touched.organization && errors.organization
                                   ? 'register-input--error'
                                   : ''
                               }`}
                             />
-                            {authCodeValidated && (
-                              <CheckCircle2
-                                size={18}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-success)]"
-                                aria-hidden="true"
-                              />
-                            )}
                           </div>
-                          {fieldError('authorizationCode')}
-                          {!authCodeValidated &&
-                            formData.authorizationCode.trim() && (
-                              <button
-                                type="button"
-                                onClick={handleValidateAuthCode}
-                                disabled={isDisabled}
-                                className="text-xs font-semibold text-[var(--color-primary)] hover:underline"
-                              >
-                                Validate Code
-                              </button>
-                            )}
-                          {authCodeValidated && (
-                            <p className="flex items-center gap-1 text-xs text-[var(--color-success)]">
-                              <CheckCircle2 size={12} aria-hidden="true" />
-                              Authorization code verified
-                            </p>
-                          )}
-                          <p className="text-xs text-[var(--text-muted)] pl-0.5">
-                            {role === 'admin'
-                              ? 'Admin code is provided by your system administrator.'
-                              : 'Organization code is issued during event registration.'}
-                          </p>
+                          {fieldError('organization')}
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                      )}
+
+                      {/* Department (Organizer only) */}
+                      {role === 'organizer' && (
+                        <div className="space-y-1.5">
+                          <label
+                            className="block text-sm font-semibold text-[var(--text-primary)]"
+                            htmlFor="reg-department"
+                          >
+                            Department
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
+                              <Briefcase size={18} aria-hidden="true" />
+                            </div>
+                            <select
+                              id="reg-department"
+                              name="department"
+                              value={formData.department}
+                              onChange={(e) =>
+                                handleField('department', e.target.value)
+                              }
+                              disabled={isDisabled}
+                              className="register-input register-input--icon register-input--select"
+                            >
+                              <option value="" disabled>
+                                Select Department
+                              </option>
+                              <option value="marketing">
+                                Marketing & Events
+                              </option>
+                              <option value="hr">Human Resources</option>
+                              <option value="ops">Operations</option>
+                              <option value="engineering">Engineering</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Authorization Code (Organizer + Admin) */}
+                      <div className="space-y-1.5">
+                        <label
+                          className="block text-sm font-semibold text-[var(--text-primary)]"
+                          htmlFor="reg-auth-code"
+                        >
+                          Authorization Code{' '}
+                          <span className="text-[var(--color-error)]">*</span>
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[var(--text-muted)]">
+                            <KeyRound size={18} aria-hidden="true" />
+                          </div>
+                          <input
+                            id="reg-auth-code"
+                            name="authorizationCode"
+                            type="text"
+                            value={formData.authorizationCode}
+                            onChange={(e) =>
+                              handleField(
+                                'authorizationCode',
+                                e.target.value,
+                              )
+                            }
+                            onBlur={() => handleBlur('authorizationCode')}
+                            placeholder={
+                              role === 'admin'
+                                ? 'ADMIN-2026-FLOWGATEX'
+                                : 'ORG-KEC-2026'
+                            }
+                            disabled={isDisabled}
+                            className={`register-input register-input--icon ${
+                              touched.authorizationCode &&
+                              errors.authorizationCode
+                                ? 'register-input--error'
+                                : ''
+                            }`}
+                          />
+                          {authCodeValidated && (
+                            <CheckCircle2
+                              size={18}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-success)]"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </div>
+                        {fieldError('authorizationCode')}
+                        {!authCodeValidated &&
+                          formData.authorizationCode.trim() && (
+                            <button
+                              type="button"
+                              onClick={handleValidateAuthCode}
+                              disabled={isDisabled}
+                              className="text-xs font-semibold text-[var(--color-primary)] hover:underline"
+                            >
+                              Validate Code
+                            </button>
+                          )}
+                        {authCodeValidated && (
+                          <p className="flex items-center gap-1 text-xs text-[var(--color-success)]">
+                            <CheckCircle2 size={12} aria-hidden="true" />
+                            Authorization code verified
+                          </p>
+                        )}
+                        <p className="text-xs text-[var(--text-muted)] pl-0.5">
+                          {role === 'admin'
+                            ? 'Admin code is provided by your system administrator.'
+                            : 'Organization code is issued during event registration.'}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
 
                   {/* Email Verification Notice */}
                   <div className="space-y-3">
@@ -1538,7 +1564,7 @@ export default function RegisterPage() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
               >
                 <StepProgress currentStep={4} />
                 <ConfirmationScreen email={formData.email} role={role} />

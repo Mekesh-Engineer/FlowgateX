@@ -85,8 +85,8 @@ export async function createUser(
     await sendEmailVerification(user, getActionCodeSettings());
 
     // 4. Store additional user data in Firestore
-    // MAP 'attendee' to 'user' to match UserRole enum used by routing
-    const dbRole = payload.role === 'attendee' ? 'user' : payload.role;
+    // Save payload.role directly — 'attendee' matches UserRole.USER ('attendee')
+    const dbRole = payload.role;
 
     await setDoc(doc(db, 'users', user.uid), {
       uid: user.uid,
@@ -306,7 +306,7 @@ export async function signUpWithGoogle(): Promise<CreateUserResponse> {
         lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
         phoneNumber: user.phoneNumber,
         photoURL: user.photoURL,
-        role: 'user',
+        role: 'attendee',
         emailVerified: user.emailVerified,
         phoneVerified: !!user.phoneNumber,
         dob: null,

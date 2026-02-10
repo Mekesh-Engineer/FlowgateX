@@ -3,7 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Smartphone, AlertCircle, Loader2, Sun, Moon, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { loginWithEmail, loginWithGoogle } from '@/features/auth/services/authService';
+import { loginWithEmail, loginWithGoogle, getUserData } from '@/features/auth/services/authService';
+import { auth } from '@/lib/firebase';
+import { ROLE_DASHBOARDS } from '@/routes/routes.config';
+import { UserRole } from '@/lib/constants';
 import { useThemeStore } from '@/store/zustand/stores';
 import PromoPanel from '@/features/auth/components/PromoPanel';
 
@@ -127,6 +130,19 @@ export default function LoginPage() {
       try {
         await loginWithEmail({ email: email.trim(), password });
 
+        // Fetch user profile to determine role-based redirect
+        const firebaseUser = auth?.currentUser;
+        let targetPath = '/dashboard';
+        if (firebaseUser) {
+          try {
+            const userProfile = await getUserData(firebaseUser.uid);
+            const targetRole = (userProfile?.role as UserRole) || UserRole.USER;
+            targetPath = ROLE_DASHBOARDS[targetRole] || '/dashboard';
+          } catch {
+            // Fallback to default dashboard on error
+          }
+        }
+
         // Persist remember-me preference
         if (rememberMe) {
           localStorage.setItem('flowgatex_remember', 'true');
@@ -140,7 +156,7 @@ export default function LoginPage() {
 
         // Navigate after a short delay so confetti is visible
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate(targetPath);
         }, 1400);
       } catch (error: unknown) {
         const err = error as { code?: string; message?: string };
@@ -161,9 +177,23 @@ export default function LoginPage() {
     setErrors({});
     try {
       await loginWithGoogle();
+
+      // Fetch user profile to determine role-based redirect
+      const firebaseUser = auth?.currentUser;
+      let targetPath = '/dashboard';
+      if (firebaseUser) {
+        try {
+          const userProfile = await getUserData(firebaseUser.uid);
+          const targetRole = (userProfile?.role as UserRole) || UserRole.USER;
+          targetPath = ROLE_DASHBOARDS[targetRole] || '/dashboard';
+        } catch {
+          // Fallback to default dashboard on error
+        }
+      }
+
       setLoginSuccess(true);
       fireConfetti();
-      setTimeout(() => navigate('/dashboard'), 1400);
+      setTimeout(() => navigate(targetPath), 1400);
     } catch (error: unknown) {
       const err = error as { message?: string };
       setErrors({ general: err.message || 'Google sign-in failed. Please try again.' });

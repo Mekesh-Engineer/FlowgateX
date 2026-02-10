@@ -5,9 +5,9 @@ export const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:3000';
 
 // User Roles
 // IMPORTANT: These values MUST match what's stored in Firestore.
-// The registration form uses 'attendee' but registrationService maps it to 'user' before saving.
+// The registration form and Firestore both use 'attendee' for standard users.
 export enum UserRole {
-  USER = 'user',
+  USER = 'attendee',
   ORGANIZER = 'organizer',
   ADMIN = 'admin',
   SUPER_ADMIN = 'superadmin',

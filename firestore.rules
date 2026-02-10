@@ -28,7 +28,7 @@ service cloud.firestore {
 
     // Validate that role field is one of the allowed values
     function isValidRole(role) {
-      return role in ['user', 'organizer', 'admin', 'superadmin'];
+      return role in ['attendee', 'organizer', 'admin', 'superadmin'];
     }
     
     // Users collection

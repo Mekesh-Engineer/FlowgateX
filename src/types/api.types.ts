@@ -75,7 +75,7 @@ export interface UserProfile {
   displayName: string;
   photoURL?: string;
   phone?: string;
-  role: 'user' | 'organizer' | 'admin';
+  role: 'attendee' | 'organizer' | 'admin';
   verified: boolean;
   createdAt: string;
   preferences?: UserPreferences;

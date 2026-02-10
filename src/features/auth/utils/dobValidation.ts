@@ -12,9 +12,13 @@ export function validateDob(value: string): string | null {
   if (isNaN(dob.getTime())) return 'Invalid date.';
 
   const today = new Date();
+  
+  // Calculate age based on year difference
   let age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+  
+  // Adjust if birthday hasn't occurred yet this year
+  const m = today.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
     age--;
   }
 
