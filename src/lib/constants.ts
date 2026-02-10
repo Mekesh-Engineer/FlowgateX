@@ -4,6 +4,8 @@ export const APP_NAME = import.meta.env.VITE_APP_NAME || 'FlowGateX';
 export const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:3000';
 
 // User Roles
+// IMPORTANT: These values MUST match what's stored in Firestore.
+// The registration form uses 'attendee' but registrationService maps it to 'user' before saving.
 export enum UserRole {
   USER = 'user',
   ORGANIZER = 'organizer',

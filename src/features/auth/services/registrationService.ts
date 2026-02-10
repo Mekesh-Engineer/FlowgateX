@@ -85,6 +85,9 @@ export async function createUser(
     await sendEmailVerification(user, getActionCodeSettings());
 
     // 4. Store additional user data in Firestore
+    // MAP 'attendee' to 'user' to match UserRole enum used by routing
+    const dbRole = payload.role === 'attendee' ? 'user' : payload.role;
+
     await setDoc(doc(db, 'users', user.uid), {
       uid: user.uid,
       email: payload.email,
@@ -93,7 +96,7 @@ export async function createUser(
       lastName: payload.lastName,
       phoneNumber: payload.mobile || null,
       photoURL: null,
-      role: payload.role || 'user',
+      role: dbRole,
       emailVerified: false,
       phoneVerified: false,
       dob: payload.dob || null,
@@ -110,7 +113,7 @@ export async function createUser(
       updatedAt: serverTimestamp(),
     });
 
-    console.log('✅ User created successfully:', user.uid);
+    console.log('✅ User created successfully:', user.uid, 'with role:', dbRole);
     console.log('📧 Verification email sent to:', payload.email);
 
     return {
@@ -257,6 +260,14 @@ export async function validateAuthCode(
 
   if (!entry) {
     throw { code: 'INVALID_AUTH_CODE', message: 'Invalid authorization code.' };
+  }
+
+  // Validate that the code matches the requested role
+  if (entry.role !== payload.role) {
+    throw {
+      code: 'INVALID_AUTH_CODE',
+      message: `This code is for ${entry.role} role, not ${payload.role}. Please use a valid ${payload.role} authorization code.`,
+    };
   }
 
   return {
