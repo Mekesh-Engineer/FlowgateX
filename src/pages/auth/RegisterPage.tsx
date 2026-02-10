@@ -231,6 +231,16 @@ export default function RegisterPage() {
     setAuthCodeValidated(false);
   }, [formData.authorizationCode]);
 
+  // Debug: Log role changes
+  useEffect(() => {
+    console.log('🎭 Role state updated:', role);
+  }, [role]);
+
+  // Debug: Log role changes
+  useEffect(() => {
+    console.log('🎭 Role state updated:', role);
+  }, [role]);
+
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
@@ -296,6 +306,7 @@ export default function RegisterPage() {
   // ---------------------------------------------------------------------------
 
   const handleRoleChange = useCallback((newRole: SignupRole) => {
+    console.log('🔄 Role changed to:', newRole);
     setRole(newRole);
     setAuthCodeValidated(false);
     trackRoleSelected(newRole);
@@ -401,6 +412,8 @@ export default function RegisterPage() {
   const handleStep3Next = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+
+      console.log('📍 Step 3 Submit - Current role:', role, '| needsAuthCode:', needsAuthCode);
 
       // Validate role-specific fields
       const validationErrors = validateStep3(formData, role);
@@ -1170,6 +1183,12 @@ export default function RegisterPage() {
                   <p className="text-[var(--text-secondary)] mt-1.5 text-sm">
                     {stepHeading.subtitle}
                   </p>
+                   {/* Debug: Show current role */}
+                  <div className="mt-3 px-3 py-2 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
+                    <p className="text-xs font-mono text-yellow-200">
+                      🔹 DEBUG MODE: role="{role}" | needsAuthCode={String(needsAuthCode)} | step={step}
+                    </p>
+                  </div>
                 </div>
 
                 {/* General error */}
@@ -1209,13 +1228,7 @@ export default function RegisterPage() {
 
                   {/* === Dynamic role-specific fields (Organizer / Admin) === */}
                   {(role === 'organizer' || role === 'admin') && (
-                    <motion.div
-                      key={`role-fields-${role}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-4"
-                    >
+                    <div className="space-y-4">
                       {/* Debug/Confirmation of Role */}
                       <p className="text-sm text-[var(--color-primary)] font-medium bg-[var(--color-primary)]/10 px-3 py-2 rounded-lg">
                         <Building2 size={14} className="inline mr-2 -mt-0.5" />
@@ -1369,7 +1382,7 @@ export default function RegisterPage() {
                             : 'Organization code is issued during event registration.'}
                         </p>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* Email Verification Notice */}
