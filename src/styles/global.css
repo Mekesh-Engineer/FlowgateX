@@ -3,10 +3,9 @@
 /* Fonts are loaded via next/font/google in layout.tsx */
 
 /* ============================================================================
-   Material Icons & Symbols - Google Fonts CDN
+   Material Icons & Symbols - loaded via <link> in index.html for reliable
+   production builds (CSS @import can be stripped by Vite bundler)
    ============================================================================ */
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round|Material+Icons+Sharp');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 /* ============================================================================
    Design Tokens + Modular Stylesheets (MUST come before @tailwind directives)
